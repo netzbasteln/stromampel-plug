@@ -2,9 +2,13 @@
 // Controls Shelly Plug S LED based on the German energy grid traffic light.
 
 // --- Customizable Settings ---
-const CHECK_INTERVAL_MS = 300000;  // Check the grid status every 5 minutes
+const CHECK_INTERVAL_MINUTES = 5;  // Check the grid status every 5 minutes
 const YELLOW_SIGNAL_BEHAVIOR = "OFF"; // Choose either "ON" or "OFF" for the yellow signal
 // --- End of Customizable Settings ---
+
+// Calculate check interval in milliseconds
+const CHECK_INTERVAL_MS = CHECK_INTERVAL_MINUTES * 60 * 1000; 
+
 
 var r = 0;
 var g = 0;
