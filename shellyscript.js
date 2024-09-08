@@ -1,39 +1,97 @@
 // Stromampel Shelly
-// Checks the API of the Energy-Charts.info - Trafficlight for renewable Energy
+// Controls Shelly Plug S LED based on the German energy grid traffic light.
 
-function getGridSignal() {
-  // Get current time in seconds (Linux time)
-  let currentTime = Math.floor(Date.now() / 1000);
+// --- Customizable Settings ---
+const CHECK_INTERVAL_MS = 300000;  // Check the grid status every 5 minutes
+const YELLOW_SIGNAL_BEHAVIOR = "OFF"; // Choose either "ON" or "OFF" for the yellow signal
+// --- End of Customizable Settings ---
 
-  // HTTP GET request using Shelly.call
-  Shelly.call("HTTP.GET", { url: "https://api.energy-charts.info/signal?country=de" }, function (result, error_code, error_message) {
-    if (error_code === 0) {
-      try {
-        let parsedData = JSON.parse(result.body);
-        if (parsedData && parsedData.unix_seconds && parsedData.signal) {
-          let closestSignal = getClosestSignal(parsedData.signal, parsedData.unix_seconds, currentTime);
-          if (closestSignal !== null) {
-            handleSignal(closestSignal);
-          } else {
-            print("Error: No matching signal found");
-          }
-        } else {
-          print("Error: No signal or unix_seconds data found");
-        }
-      } catch (error) {
-        print("Error parsing JSON: " + error.message);
+var r = 0;
+var g = 0;
+var b = 0;
+
+// Function to set the RGB LED color
+function setRGB() {
+  Shelly.call(
+    "PLUGS_UI.SetConfig",
+    {
+      id: 0,
+      config: {
+        "leds": {
+          "mode": "switch",
+          "colors": {
+            "switch:0": {
+              "on": { "rgb": [r, g, b], "brightness": 100 },
+              "off": { "rgb": [r, g, b], "brightness": 100 } 
+            }
+          },
+          "power": { "brightness": 100 },
+          "night_mode": { "enable": true, "brightness": 100, "active_between": ["20:00", "08:00"] }
+        },
+        "controls": { "switch:0": { "in_mode": "momentary" } }
       }
-    } else {
-      print("Error fetching API: " + error_message);
-    }
-  });
+    },
+    null,
+    null
+  );
 }
 
+// --- Energy Grid Traffic Light Logic ---
+
+// Function to get the energy grid signal
+function getGridSignal() {
+  // Get and format the local time 
+  let now = new Date();
+  let hours = now.getHours();
+  let minutes = now.getMinutes();
+  let seconds = now.getSeconds();
+
+  // Add leading zero if needed
+  hours = (hours < 10 ? "0" : "") + hours;
+  minutes = (minutes < 10 ? "0" : "") + minutes;
+  seconds = (seconds < 10 ? "0" : "") + seconds;
+
+  let localTime = hours + ":" + minutes + ":" + seconds;
+
+  print("Checking API at", localTime); 
+  let currentTime = Math.floor(Date.now() / 1000);
+
+  Shelly.call(
+    "HTTP.GET",
+    { url: "https://api.energy-charts.info/signal?country=de" },
+    function (result, error_code, error_message) {
+      if (error_code === 0) {
+        try {
+          let parsedData = JSON.parse(result.body);
+          if (parsedData && parsedData.unix_seconds && parsedData.signal) {
+            let closestSignal = getClosestSignal(
+              parsedData.signal,
+              parsedData.unix_seconds,
+              currentTime
+            );
+            if (closestSignal !== null) {
+              handleSignal(closestSignal);
+            } else {
+              print("Error: No matching signal found");
+            }
+          } else {
+            print("Error: No signal or unix_seconds data found");
+          }
+        } catch (error) {
+          print("Error parsing JSON: " + error.message);
+        }
+      } else {
+        print("Error fetching API: " + error_message);
+      }
+    }
+  );
+}
+
+// Function to find the closest signal time
 function getClosestSignal(signals, unix_seconds, currentTime) {
   let closestIndex = null;
   let closestDiff = Number.MAX_VALUE;
 
-  // Loop through unix_seconds and find the closest to the current time
   for (let i = 0; i < unix_seconds.length; i++) {
     let timeDiff = Math.abs(currentTime - unix_seconds[i]);
     if (timeDiff < closestDiff) {
@@ -42,37 +100,47 @@ function getClosestSignal(signals, unix_seconds, currentTime) {
     }
   }
 
-  // Return the signal corresponding to the closest unix_seconds
   return closestIndex !== null ? signals[closestIndex] : null;
 }
 
-function setDeviceState(state) {
-  Shelly.call("Switch.Set", { id: 0, on: state }, null);  // Assume relay is at id 0
-}
-
+// Function to set the device state and LED color
 function handleSignal(signal) {
   if (signal === 2) {
-    // Green signal: Turn ON the device
+    // Green signal
     setDeviceState(true);
-    print("Grid signal green, turning device ON");
+    r = 0;
+    g = 100;
+    b = 0;
+    setRGB();
+    print("Grid signal green, device ON");
   } else if (signal === 1) {
-    // Yellow signal: Customize what you want to do with the device
-    // Uncomment the following lines to turn OFF the device for yellow signal
-    setDeviceState(false);
-    print("Grid signal yellow, turning device OFF");
-    // Uncomment the following lines to turn ON the device for yellow signal
-    // setDeviceState(true);
-    // print("Grid signal yellow, turning device ON");
-  
+    // Yellow signal
+    if (YELLOW_SIGNAL_BEHAVIOR === "ON") {
+      setDeviceState(true);
+    } else {
+      setDeviceState(false);
+    }
+    r = 100; 
+    g = 100;
+    b = 0;  
+    setRGB();
+    print("Grid signal yellow, device " + YELLOW_SIGNAL_BEHAVIOR);
   } else {
-    // Red signal: Turn OFF the device
+    // Red signal
     setDeviceState(false);
-    print("Grid signal red, turning device OFF");
+    r = 100;
+    g = 0;
+    b = 0;
+    setRGB();
+    print("Grid signal red, device OFF");
   }
 }
 
-// Main loop to check the grid signal every 5 minutes
-Timer.set(300000, true, getGridSignal);
+// Function to set the device state (on/off)
+function setDeviceState(state) {
+  Shelly.call("Switch.Set", { id: 0, on: state }, null);
+}
 
-// Initial call to start the process
+// Start checking the grid signal
 getGridSignal();
+Timer.set(CHECK_INTERVAL_MS, true, getGridSignal);
