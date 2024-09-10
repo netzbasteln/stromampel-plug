@@ -1,0 +1,22 @@
+// second script for Shelly Plug S
+// makes the LED light green, when the switch is on and red if it is off.
+
+Shelly.call( 
+  "PLUGS_UI.SetConfig",
+  {
+    id: 0,
+    config: {
+      "leds": {
+        "mode": "switch",
+        "colors": {
+          "switch:0": {
+            "on": { "rgb": [0, 100, 0], "brightness": 100 },  // Green for ON
+            "off": { "rgb": [100, 0, 0], "brightness": 100 } // Red for OFF
+          }
+        }
+      }
+    }
+  },
+  function (result, code, msg, ud) {},
+  null
+);
