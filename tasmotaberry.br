@@ -1,0 +1,113 @@
+# Does not work yet, attribute error
+
+import json  # Import the JSON module
+import math  # Import the math module for mathematical functions
+
+def get_grid_signal_json()
+  var cl = webclient()
+  cl.begin("https://api.energy-charts.info/signal?country=de")  # Replace with your JSON API URL
+  var response_code = cl.GET()
+
+  if response_code == 200
+    var response_content = cl.get_string()
+    print("Response content: " + response_content)  # Log the raw JSON response
+
+    # Step 1: Validate and Print JSON Content
+    if response_content == "" || response_content == nil
+      print("Error: Received empty or nil response from API.")
+      return
+    end
+
+    try
+      # Step 2: Parse JSON response
+      var data = json.load(response_content)  
+      print("Parsed JSON data: " + str(data))  # Log the parsed JSON data
+
+      # Initialize variables for the fields
+      var unix_seconds_list = []
+      var signal_list = []
+
+      # Check 'unix_seconds' field
+      if data.contains("unix_seconds")
+        if type(data["unix_seconds"]) == "list" || type(data["unix_seconds"]) == "instance"
+          print("'unix_seconds' is an instance or list. Converting to a native list.")
+          # Use safe iteration to convert to native list
+          var length = size(data["unix_seconds"])
+          for i : 0 .. length - 1
+            unix_seconds_list.push(data["unix_seconds"][i])
+          end
+        else
+          print("Error: 'unix_seconds' is not a list or instance.")
+        end
+        print("Content of 'unix_seconds': " + str(unix_seconds_list))
+      else
+        print("Missing field: 'unix_seconds'")
+      end
+
+      # Check 'signal' field
+      if data.contains("signal")
+        if type(data["signal"]) == "list" || type(data["signal"]) == "instance"
+          print("'signal' is an instance or list. Converting to a native list.")
+          # Use safe iteration to convert to native list
+          var length = size(data["signal"])
+          for i : 0 .. length - 1
+            signal_list.push(data["signal"][i])
+          end
+        else
+          print("Error: 'signal' is not a list or instance.")
+        end
+        print("Content of 'signal': " + str(signal_list))
+      else
+        print("Missing field: 'signal'")
+      end
+
+      # Step 4: Process the signals if fields are present
+      if unix_seconds_list != nil && signal_list != nil && size(unix_seconds_list) == size(signal_list)
+        print("Valid data structure detected. Processing signals...")
+
+        # Get the current Unix timestamp
+        var currentTimestamp = tasmota.time()  # Assuming tasmota.time() returns the current Unix timestamp
+        var closestSignal = nil
+        var closestDifference = 9223372036854775807  # Use a large initial value for comparison (maximum int)
+
+        # Use 'for' loop to iterate over the timestamps and signals by index
+        for i : 0 .. size(unix_seconds_list) - 1
+          var timestamp = unix_seconds_list[i]
+          var signal_value = signal_list[i]
+          var difference = math.abs(currentTimestamp - timestamp)  # Calculate absolute difference
+          print("Timestamp: " + str(timestamp) + ", Signal: " + str(signal_value) + ", Difference: " + str(difference))
+
+          if difference < closestDifference
+            closestDifference = difference
+            closestSignal = signal_value
+          end
+        end
+
+        # Step 5: Return the traffic light status
+        if closestSignal != nil
+          print("Closest signal found: " + str(closestSignal))
+          if closestSignal == 2
+            tasmota.set_power(0, true)  # Turn the relay/light ON (green signal)
+            print("Signal: Green, Device ON")
+          elif closestSignal == 1
+            print("Signal: Yellow, No change in device status")
+          else
+            tasmota.set_power(0, false)  # Turn the relay/light OFF (red signal)
+            print("Signal: Red, Device OFF")
+          end
+        else
+          print("Error: No valid signal found")
+        end
+      else
+        print("Error: Required fields are missing or could not be accessed.")
+      end
+    except .. as e
+      print("Error parsing JSON: " + str(e))  # Handle JSON parsing errors
+    end
+  else
+    print("Error: HTTP response code " + str(response_code))  # Handle HTTP errors
+  end
+end
+
+# Test the function manually
+get_grid_signal_json()
