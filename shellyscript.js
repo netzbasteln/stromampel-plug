@@ -1,6 +1,6 @@
-// Stromampel Shelly
+// Stromampel für Shelly Plus S v2
 // Controls Shelly Plug S LED based on the German energy grid traffic light.
-
+// Version 1.0 - 10 September 2024 -- CC Zero - https://creativecommons.org/publicdomain/zero/1.0/
 // --- Customizable Settings ---
 const CHECK_INTERVAL_MINUTES = 5;  // Check the grid status every 5 minutes
 const YELLOW_SIGNAL_BEHAVIOR = "OFF"; // Choose either "ON" or "OFF" for the yellow signal
@@ -9,56 +9,13 @@ const YELLOW_SIGNAL_BEHAVIOR = "OFF"; // Choose either "ON" or "OFF" for the yel
 // Calculate check interval in milliseconds
 const CHECK_INTERVAL_MS = CHECK_INTERVAL_MINUTES * 60 * 1000; 
 
-
-var r = 0;
-var g = 0;
-var b = 0;
-
-// Function to set the RGB LED color
-function setRGB() {
-  Shelly.call(
-    "PLUGS_UI.SetConfig",
-    {
-      id: 0,
-      config: {
-        "leds": {
-          "mode": "switch",
-          "colors": {
-            "switch:0": {
-              "on": { "rgb": [r, g, b], "brightness": 100 },
-              "off": { "rgb": [r, g, b], "brightness": 100 } 
-            }
-          },
-          "power": { "brightness": 100 },
-          "night_mode": { "enable": true, "brightness": 100, "active_between": ["20:00", "08:00"] }
-        },
-        "controls": { "switch:0": { "in_mode": "momentary" } }
-      }
-    },
-    null,
-    null
-  );
-}
-
 // --- Energy Grid Traffic Light Logic ---
 
 // Function to get the energy grid signal
 function getGridSignal() {
-  // Get and format the local time 
   let now = new Date();
-  let hours = now.getHours();
-  let minutes = now.getMinutes();
-  let seconds = now.getSeconds();
-
-  // Add leading zero if needed
-  hours = (hours < 10 ? "0" : "") + hours;
-  minutes = (minutes < 10 ? "0" : "") + minutes;
-  seconds = (seconds < 10 ? "0" : "") + seconds;
-
-  let localTime = hours + ":" + minutes + ":" + seconds;
-
+  let localTime = now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
   print("Checking API at", localTime); 
-  let currentTime = Math.floor(Date.now() / 1000);
 
   Shelly.call(
     "HTTP.GET",
@@ -68,11 +25,7 @@ function getGridSignal() {
         try {
           let parsedData = JSON.parse(result.body);
           if (parsedData && parsedData.unix_seconds && parsedData.signal) {
-            let closestSignal = getClosestSignal(
-              parsedData.signal,
-              parsedData.unix_seconds,
-              currentTime
-            );
+            let closestSignal = getClosestSignal(parsedData.signal, parsedData.unix_seconds);
             if (closestSignal !== null) {
               handleSignal(closestSignal);
             } else {
@@ -92,10 +45,10 @@ function getGridSignal() {
 }
 
 // Function to find the closest signal time
-function getClosestSignal(signals, unix_seconds, currentTime) {
+function getClosestSignal(signals, unix_seconds) {
+  let currentTime = Math.floor(Date.now() / 1000);
   let closestIndex = null;
   let closestDiff = Number.MAX_VALUE;
-
   for (let i = 0; i < unix_seconds.length; i++) {
     let timeDiff = Math.abs(currentTime - unix_seconds[i]);
     if (timeDiff < closestDiff) {
@@ -107,42 +60,25 @@ function getClosestSignal(signals, unix_seconds, currentTime) {
   return closestIndex !== null ? signals[closestIndex] : null;
 }
 
-// Function to set the device state and LED color
+// Function to handle the grid signal
 function handleSignal(signal) {
   if (signal === 2) {
     // Green signal
-    setDeviceState(true);
-    r = 0;
-    g = 100;
-    b = 0;
-    setRGB();
+    Shelly.call("Switch.Set", { id: 0, on: true }, null, null);
     print("Grid signal green, device ON");
   } else if (signal === 1) {
     // Yellow signal
     if (YELLOW_SIGNAL_BEHAVIOR === "ON") {
-      setDeviceState(true);
+      Shelly.call("Switch.Set", { id: 0, on: true }, null, null);
     } else {
-      setDeviceState(false);
+      Shelly.call("Switch.Set", { id: 0, on: false }, null, null);
     }
-    r = 100; 
-    g = 100;
-    b = 0;  
-    setRGB();
     print("Grid signal yellow, device " + YELLOW_SIGNAL_BEHAVIOR);
   } else {
     // Red signal
-    setDeviceState(false);
-    r = 100;
-    g = 0;
-    b = 0;
-    setRGB();
+    Shelly.call("Switch.Set", { id: 0, on: false }, null, null);
     print("Grid signal red, device OFF");
   }
-}
-
-// Function to set the device state (on/off)
-function setDeviceState(state) {
-  Shelly.call("Switch.Set", { id: 0, on: state }, null);
 }
 
 // Start checking the grid signal
