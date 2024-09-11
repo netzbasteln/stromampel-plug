@@ -1,6 +1,6 @@
-// Stromampel für Shelly Plus S v2
-// Controls Shelly Plug S LED based on the German energy grid traffic light.
-// Version 1.0 - 10 September 2024 -- CC Zero - https://creativecommons.org/publicdomain/zero/1.0/
+// Stromampel for Shelly Plus Plug S
+// Controls Shelly Plus Plug S Output based on the German energy grid traffic light by energy-charts.info
+// Shelly Script - Version 1.0 - 10 September 2024 -- CC Zero - https://creativecommons.org/publicdomain/zero/1.0/
 // --- Customizable Settings ---
 const CHECK_INTERVAL_MINUTES = 5;  // Check the grid status every 5 minutes
 const YELLOW_SIGNAL_BEHAVIOR = "OFF"; // Choose either "ON" or "OFF" for the yellow signal
