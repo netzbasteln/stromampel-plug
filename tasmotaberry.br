@@ -1,6 +1,5 @@
-# Does not work yet, attribute error
-
-import json  # Import the JSON module
+# Does not work yet, attribute error when parsing json
+# import json  # Import the JSON module
 import math  # Import the math module for mathematical functions
 
 def get_grid_signal_json()
@@ -12,26 +11,30 @@ def get_grid_signal_json()
     var response_content = cl.get_string()
     print("Response content: " + response_content)  # Log the raw JSON response
 
-    # Step 1: Validate and Print JSON Content
     if response_content == "" || response_content == nil
       print("Error: Received empty or nil response from API.")
       return
     end
 
-    try
-      # Step 2: Parse JSON response
-      var data = json.load(response_content)  
-      print("Parsed JSON data: " + str(data))  # Log the parsed JSON data
+    # Check for possible truncation manually
+    var last_char = response_content[size(response_content) - 1]
+    if last_char != "}"
+      print("Error: Truncated JSON response. Last character is '" + last_char + "'")
+      return
+    end
 
-      # Initialize variables for the fields
+    try
+      print("Attempting to parse JSON content...")
+      var data = json.load(response_content)  # Try using json.load()
+      print("Parsed JSON data: " + str(data))
+
       var unix_seconds_list = []
       var signal_list = []
 
-      # Check 'unix_seconds' field
+      # Check and convert 'unix_seconds'
       if data.contains("unix_seconds")
         if type(data["unix_seconds"]) == "list" || type(data["unix_seconds"]) == "instance"
           print("'unix_seconds' is an instance or list. Converting to a native list.")
-          # Use safe iteration to convert to native list
           var length = size(data["unix_seconds"])
           for i : 0 .. length - 1
             unix_seconds_list.push(data["unix_seconds"][i])
@@ -44,11 +47,10 @@ def get_grid_signal_json()
         print("Missing field: 'unix_seconds'")
       end
 
-      # Check 'signal' field
+      # Check and convert 'signal'
       if data.contains("signal")
         if type(data["signal"]) == "list" || type(data["signal"]) == "instance"
           print("'signal' is an instance or list. Converting to a native list.")
-          # Use safe iteration to convert to native list
           var length = size(data["signal"])
           for i : 0 .. length - 1
             signal_list.push(data["signal"][i])
@@ -61,39 +63,38 @@ def get_grid_signal_json()
         print("Missing field: 'signal'")
       end
 
-      # Step 4: Process the signals if fields are present
+      # Ensure both lists are not nil and have the same length
       if unix_seconds_list != nil && signal_list != nil && size(unix_seconds_list) == size(signal_list)
         print("Valid data structure detected. Processing signals...")
-
-        # Get the current Unix timestamp
-        var currentTimestamp = tasmota.time()  # Assuming tasmota.time() returns the current Unix timestamp
+        var currentTimestamp = tasmota.time()
         var closestSignal = nil
-        var closestDifference = 9223372036854775807  # Use a large initial value for comparison (maximum int)
+        var closestDifference = 9223372036854775807
 
-        # Use 'for' loop to iterate over the timestamps and signals by index
         for i : 0 .. size(unix_seconds_list) - 1
           var timestamp = unix_seconds_list[i]
           var signal_value = signal_list[i]
-          var difference = math.abs(currentTimestamp - timestamp)  # Calculate absolute difference
+          var difference = math.abs(currentTimestamp - timestamp)
           print("Timestamp: " + str(timestamp) + ", Signal: " + str(signal_value) + ", Difference: " + str(difference))
 
+          # Check for attribute errors in this comparison and assignment
           if difference < closestDifference
             closestDifference = difference
             closestSignal = signal_value
+            print("New closest signal found: " + str(closestSignal))
           end
         end
 
-        # Step 5: Return the traffic light status
+        # After processing signals
         if closestSignal != nil
           print("Closest signal found: " + str(closestSignal))
           if closestSignal == 2
-            tasmota.set_power(0, true)  # Turn the relay/light ON (green signal)
-            print("Signal: Green, Device ON")
+            print("Setting power ON (Green Signal)")
+            tasmota.set_power(0, true)
           elif closestSignal == 1
-            print("Signal: Yellow, No change in device status")
+            print("Yellow Signal: No change in device status")
           else
-            tasmota.set_power(0, false)  # Turn the relay/light OFF (red signal)
-            print("Signal: Red, Device OFF")
+            print("Setting power OFF (Red Signal)")
+            tasmota.set_power(0, false)
           end
         else
           print("Error: No valid signal found")
@@ -102,12 +103,11 @@ def get_grid_signal_json()
         print("Error: Required fields are missing or could not be accessed.")
       end
     except .. as e
-      print("Error parsing JSON: " + str(e))  # Handle JSON parsing errors
+      print("Error parsing JSON or processing signals: " + str(e))
     end
   else
-    print("Error: HTTP response code " + str(response_code))  # Handle HTTP errors
+    print("Error: HTTP response code " + str(response_code))
   end
 end
 
-# Test the function manually
 get_grid_signal_json()
