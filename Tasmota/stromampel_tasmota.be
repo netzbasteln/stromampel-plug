@@ -72,7 +72,7 @@ end
 tasmota.remove_cron("stromampel_update")
 tasmota.add_cron("0 */15 * * * *", update_power_status_from_grid_signal, "stromampel_update")
 
-# Update (wait 10 seconds for the network connection to establish on boot)
-tasmota.set_timer(10000, update_power_status_from_grid_signal)
+# Update (wait 30 seconds for the network connection to establish on boot)
+tasmota.set_timer(30000, update_power_status_from_grid_signal)
 # To immediately update instead, eg. when testing the script in the Berry console:
 #update_power_status_from_grid_signal()

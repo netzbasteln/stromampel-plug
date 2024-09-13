@@ -6,7 +6,7 @@ const YELLOW_SIGNAL_BEHAVIOR = "OFF";  // Choose either "ON" or "OFF" for when t
 // --- End of Customizable Settings ---
 
 // Loads the energy grid signal via API
-function getGridSignal() {
+function updatePowerStatusFromGridSignal() {
   let now = new Date();
   let localTime = now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
   print("Updating power status from grid signal ... Time: ", localTime);
@@ -77,7 +77,9 @@ function handleSignal(signal) {
 }
 
 // Start checking the grid signal every 15 minutes
-Timer.set(15 * 60 * 1000, true, getGridSignal);
+Timer.set(15 * 60 * 1000, true, updatePowerStatusFromGridSignal);
 
-// Update now
-getGridSignal();
+// Update (wait 30 seconds for the network connection to establish on boot)
+Timer.set(30 * 1000, false, updatePowerStatusFromGridSignal);
+// To immediately update instead, eg. when testing the script in the Shelly console:
+//updatePowerStatusFromGridSignal()
