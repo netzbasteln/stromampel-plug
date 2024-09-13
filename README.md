@@ -6,4 +6,4 @@ stromampel_shelly.js is written in [Shelly Script](https://shelly-api-docs.shell
 
 stromampel_tasmota.be is written in [Tasmota Berry](https://tasmota.github.io/docs/Berry/). Here you first have to set your timezone, e.g. using <https://tasmotatimezone.com>.
 
-As discussed in [https://share.deutschlandradio.de/dlf-audiothek-audio-teilen.html?audio_id=dira_DLF_62eb00f2](Deutschlandfunk - Selbermachtipp: Eine Steckdose auf erneuerbaren Strom programmieren) on October 6th 2024.
+As discussed in [Deutschlandfunk - Selbermachtipp: Eine Steckdose auf erneuerbaren Strom programmieren](https://share.deutschlandradio.de/dlf-audiothek-audio-teilen.html?audio_id=dira_DLF_62eb00f2) on October 6th 2024.
