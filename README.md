@@ -5,7 +5,7 @@ Scripts that switch ESP32-based Shelly and Tasmota smart plugs according to the 
 
 **stromampel_shelly.js** is written in [Shelly Script](https://shelly-api-docs.shelly.cloud/gen2/Scripts/Tutorial/). Just upload and enable "Run on startup". Tested with Shelly Plus Plug S v2.
 
-**stromampel_tasmota.be **is written in [Tasmota Berry](https://tasmota.github.io/docs/Berry/). Here you first have to set your timezone, e.g. using [tasmotatimezone.com](https://tasmotatimezone.com). Tested with NOUS A8T Smart Plug.
+**stromampel_tasmota.be** is written in [Tasmota Berry](https://tasmota.github.io/docs/Berry/). Here you first have to set your timezone, e.g. using [tasmotatimezone.com](https://tasmotatimezone.com). Tested with NOUS A8T Smart Plug.
 
 ## Anleitung Deutsch
 
