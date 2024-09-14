@@ -8,8 +8,7 @@ Scripts that switch ESP32-based Shelly and Tasmota smart plugs according to the 
 **stromampel_tasmota.be** is written in [Tasmota Berry](https://tasmota.github.io/docs/Berry/). Here you first have to set your timezone, e.g. using [tasmotatimezone.com](https://tasmotatimezone.com). Tested with NOUS A8T Smart Plug.
 
 ## Anleitung Deutsch
-
-**Stromampel-Plug: **Skripte, die ESP32-basierte Shelly- und Tasmota-Smart-Plugs je nach Anteil erneuerbarer Energien im deutschen Stromnetz steuern, indem sie die API von energy-charts.info abfragen. Erforderlich sind neuere ESP32-Steckdosenadapter. Ältere ESP8266-Geräte funktionieren nicht! Wie vorgestellt im [Deutschlandfunk - Selbermachtipp: Eine Steckdose auf erneuerbaren Strom programmieren](https://share.deutschlandradio.de/dlf-audiothek-audio-teilen.html?audio_id=dira_DLF_62eb00f2) am 6. Oktober 2024.
+Skripte, die ESP32-basierte Shelly- und Tasmota-Smart-Plugs je nach Anteil erneuerbarer Energien im deutschen Stromnetz steuern, indem sie die API von energy-charts.info abfragen. Erforderlich sind neuere ESP32-Steckdosenadapter. Ältere ESP8266-Geräte funktionieren nicht! Wie vorgestellt im [Deutschlandfunk - Selbermachtipp: Eine Steckdose auf erneuerbaren Strom programmieren](https://share.deutschlandradio.de/dlf-audiothek-audio-teilen.html?audio_id=dira_DLF_62eb00f2) am 6. Oktober 2024.
 
 ### Shelly
 [stromampel_shelly.js](https://raw.githubusercontent.com/netzbasteln/stromampel-plug/main/Shelly/stromampel_shelly.js "stromampel_shelly.js") ist in Shelly Script geschrieben. Einfach hochladen und "Run on startup" aktivieren. Getestet mit [Shelly Plus Plug S v2](https://preisvergleich.heise.de/?fs=Shelly+Plus+Plug+S&hloc=at&hloc=de "Shelly Plus Plug S v2").
