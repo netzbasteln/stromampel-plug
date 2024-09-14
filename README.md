@@ -1,4 +1,6 @@
-#Stromampel Plug 
+# **Stromampel Plug** 
+*(herunterscrollen für deutsche Anleitung)
+*
 (herunterscrollen für deutsche Anleitung)
 Scripts that switch ESP32-based Shelly and Tasmota smart plugs according to the amount of renewable energy in the German power by reqeusting the API of [energy-charts.info](https://energy-charts.info/charts/consumption_advice/chart.htm?l=de&c=DE). ESP32 Plugs required, older ESP8266 devices do not work!
 
