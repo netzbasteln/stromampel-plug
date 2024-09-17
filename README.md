@@ -36,7 +36,7 @@ Skripte, die ESP32-basierte Shelly- und Tasmota-Smart-Plugs je nach Anteil erneu
 - Das Berry-Script im Dateisystem speichern, 
 - Zu Tools -> Manage File system –> Create and edit new file gehen
 - Hier unter "File:" statt `/newfile.txt` Dateinamen eingeben: `/stromampel_tasmota.be`
-- und den Inhalt der Datei [stromampel_tasmota.be](https://raw.githubusercontent.com/netzbasteln/stromampel-plug/main/Tasmota/stromampel_tasmota.be "stromampel_tasmota.be") in das Inhaltsfeld kopieren (das evtl. darin stehende "newfile.txt" ersetzen) 
+- und [den Inhalt der Datei stromampel_tasmota.be](https://raw.githubusercontent.com/netzbasteln/stromampel-plug/main/Tasmota/stromampel_tasmota.be "stromampel_tasmota.be") in das Inhaltsfeld kopieren (das evtl. darin stehende "newfile.txt" ersetzen) 
 - Speichern, stromampel_tasmota.be sollte in der Liste erscheinen
 - Genauso die Datei `/autostart.be` [mit diesem Inhalt](https://raw.githubusercontent.com/netzbasteln/stromampel-plug/main/Tasmota/autoexec.be "/autostart.be") anlegen (falls noch keine da ist, sonst mit dem Inhalt ergänzen) und speichern
 - Steckdose neu starten. Nach 30 Sekunden sollten die ersten API-Abfragen laufen und sich die Dose entsprechend an/ausschalten.
