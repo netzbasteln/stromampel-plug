@@ -22,10 +22,10 @@ Skripte, die ESP32-basierte Shelly- und Tasmota-Smart-Plugs je nach Anteil erneu
 - Nach 30 Sekunden sollte das Skript erstmals die Stromampel abrufen, das sollte auch in den Logs stehen. 
 - Falls alles klappt, das Skript in der Scripts-Übersicht mit "Run on startup" dauerhaft aktivieren
 - Bei Home -> Switches (Bereich in der Mitte) -> LED Indication den LED indication mode auf "Switch state stellen", Save.
-- Optional anbau ist im obersten Teil Code des Skripts, ob eine gelbe Stromampel den Schalter ON oder OFF schaltet. Standard ist OFF.
+- Im obersten Teil des Skripts kann eingestellt werden, ob eine gelbe Stromampel den Schalter ON oder OFF schaltet. Standard ist OFF.
  
-#### Tasmota
-[stromampel_tasmota.be](https://raw.githubusercontent.com/netzbasteln/stromampel-plug/main/Tasmota/stromampel_tasmota.be "stromampel_tasmota.be")  ist in Tasmota Berry geschrieben. Getestet mit [NOUS A8T Smart Plug](https://preisvergleich.heise.de/nous-smart-wifi-a8t-a3292043.html "NOUS A8T Smart Plug."), sollte auch auf [anderen ESP32-Devices](https://templates.blakadder.com/esp32.html"anderen ESP32-Tasmota-Devices") laufen.
+### Tasmota
+[stromampel_tasmota.be](https://raw.githubusercontent.com/netzbasteln/stromampel-plug/main/Tasmota/stromampel_tasmota.be "stromampel_tasmota.be")  ist in Tasmota Berry geschrieben. Getestet mit [NOUS A8T Smart Plug](https://preisvergleich.heise.de/nous-smart-wifi-a8t-a3292043.html "NOUS A8T Smart Plug."), sollte auch auf [anderen ESP32-Devices](https://templates.blakadder.com/esp32.html) laufen.
 
 - Einstecken. Mit dem WLAN tasmota-..... verbinden. Falls kein Popup erscheint, http://192.168.4.1 öffnen
 - Eigenes WLAN wählen und Passwort eingeben- Absenden
@@ -40,4 +40,4 @@ Skripte, die ESP32-basierte Shelly- und Tasmota-Smart-Plugs je nach Anteil erneu
 - Speichern, stromampel_tasmota.be sollte in der Liste erscheinen
 - Genauso die Datei [/autostart.be](https://raw.githubusercontent.com/netzbasteln/stromampel-plug/main/Tasmota/autoexec.be "/autostart.be") anlegen (falls noch keine da ist, sonst mit dem Inhalt ergänzen) und speichern
 - Steckdose neu starten. Nach 30 Sekunden sollten die ersten API-Abfragen laufen und sich die Dose entsprechend an/ausschalten.
-- Optional anbau ist im obersten Teil Code des Skripts, ob eine gelbe Stromampel den Schalter ON oder OFF schaltet. Standard ist OFF.
+- Im obersten Teil des Skripts kann eingestellt werden, ob eine gelbe Stromampel den Schalter ON oder OFF schaltet. Standard ist OFF.
